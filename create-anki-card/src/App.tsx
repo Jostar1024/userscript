@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { toDesktop } from "./request.ts";
 import "./App.css";
 import { log } from "./utils";
+import Card from "./Card.tsx";
 
 const getSentence = () => {
   const sentence = window.getSelection().toString();
@@ -10,14 +11,8 @@ const getSentence = () => {
     : sentence;
 };
 
-const trim = (str) => {
-  const res = str.trim();
-  return [".", ",", "!", "?"].some((symbol) => res.endsWith(symbol))
-    ? res.slice(0, -1)
-    : res;
-};
-const createAnkiCard = ({ word, sentence, title, link, translation }) => {
-  toDesktop({
+const createAnkiCard = async ({ word, sentence, title, link, translation }) => {
+  const { result, error } = await toDesktop({
     deckName: "experiment",
     modelName: "basic-clip",
     fields: {
@@ -29,6 +24,7 @@ const createAnkiCard = ({ word, sentence, title, link, translation }) => {
     },
     tags: ["English"],
   });
+  console.log(result, error);
 };
 const translate = (sentence) => sentence;
 
@@ -36,78 +32,26 @@ function App() {
   const [word, setWord] = useState("");
 
   const sentence = getSentence();
-  const words = sentence.split(" ");
   const title = document.title;
   const link = document.location.href;
   const translation = translate(sentence);
 
-  const clickWord = (event) => {
-    const word = trim(event.target.innerHTML);
-    setWord(word);
-    console.log("click word", word);
-  };
   /* const translation = translate(selection); */
   return (
     <div>
-      <div className="px-4 sm:px-0">
-        <h3 className="text-base font-semibold leading-7 text-gray-900">
-          Making (which type) Anki Card
-        </h3>
+      <div
+        id="default-modal"
+        tabindex="-1"
+        class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex"
+      >
+        <div class="relative p-4 w-full max-w-2xl max-h-full">
+          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <Card sentence={sentence} title={title} translation={translation} />
+          </div>
+        </div>
       </div>
-      <div className="mt-6 border-t border-gray-100">
-        <dl className="divide-y divide-gray-100">
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
-              Word
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {word}
-            </dd>
-          </div>
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
-              Sentence
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {words.map((word) => (
-                <span onClick={clickWord}>{word} </span>
-              ))}
-            </dd>
-          </div>
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
-              Source-URL
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {link}
-            </dd>
-          </div>
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
-              Source-Name
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {title}
-            </dd>
-          </div>
-          <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt className="text-sm font-medium leading-6 text-gray-900">
-              Translation
-            </dt>
-            <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              empty
-            </dd>
-          </div>
-        </dl>
-        <button
-          className="pointer-events-auto rounded-md bg-indigo-600 px-3 py-2 text-[0.8125rem] font-semibold leading-5 text-white hover:bg-indigo-500"
-          onClick={() => {
-            createAnkiCard({ word, sentence, link, title, translation });
-          }}
-        >
-          Create Anki Card
-        </button>
-      </div>
+      {/* backdrop */}
+      <div class="bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40"></div>
     </div>
   );
 }
