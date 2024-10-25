@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useLayoutEffect } from "react";
 import { toDesktop } from "./request.ts";
 import "./App.css";
 import { log } from "./utils";
@@ -29,8 +29,10 @@ const createAnkiCard = async ({ word, sentence, title, link, translation }) => {
 const translate = (sentence) => sentence;
 
 function App() {
-  const [word, setWord] = useState("");
-
+  const dialog = useRef();
+  useLayoutEffect(() => {
+    dialog.current.showModal();
+  }, [dialog]);
   const sentence = getSentence();
   const title = document.title;
   const link = document.location.href;
@@ -38,21 +40,21 @@ function App() {
 
   /* const translation = translate(selection); */
   return (
-    <div>
-      <div
-        id="default-modal"
-        tabindex="-1"
-        class="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex"
-      >
-        <div class="relative p-4 w-full max-w-2xl max-h-full">
-          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            <Card sentence={sentence} title={title} translation={translation} />
-          </div>
-        </div>
+    <dialog
+      class="backdrop:bg-gray-900/50
+             overflow-y-auto overflow-x-hidden fixed justify-center items-center
+             w-full
+             rounded-lg
+             shadow
+             flex
+             md:w-1/2
+             "
+      ref={dialog}
+    >
+      <div class="relative">
+        <Card sentence={sentence} title={title} translation={translation} />
       </div>
-      {/* backdrop */}
-      <div class="bg-gray-900/50 dark:bg-gray-900/80 fixed inset-0 z-40"></div>
-    </div>
+    </dialog>
   );
 }
 
