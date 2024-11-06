@@ -7,6 +7,8 @@ import { awaitElement, log, addLocationChangeCallback } from "./utils";
 
 log("React script has successfully started");
 
+const globalContainerId = "GLOBAL-CONTAINER-ID";
+
 // Do required initial work. Gets called every time the URL changes,
 // so that elements can be re-inserted as a user navigates a page with
 // different routes.
@@ -14,11 +16,22 @@ async function main() {
   // Find <body/>. This can be any element. We wait until
   // the page has loaded enough for that element to exist.
   const body = await awaitElement("body");
-  const container = document.createElement("div");
-  body.appendChild(container);
 
-  const renderIn = createShadowRoot(container, styles);
-  createRoot(renderIn).render(<App />);
+  /* const container = createContainer();
+   * body.appendChild(container);
+
+   * createRoot(container).render(<App/>); */
+  const container = findContainer();
+
+  if (container == null) {
+    const container = createContainer();
+    body.appendChild(container);
+
+    /* const renderIn = createShadowRoot(container, styles); */
+    createRoot(container).render(<App container={container}/>);
+  } else {
+    createRoot(container).render(<App container={container}/>);
+  }
 }
 
 // Call `main()` every time the page URL changes, including on first load.
@@ -30,18 +43,12 @@ addLocationChangeCallback(() => {
   });
 });
 
-// TODO: maybe use ReactDOMserver.render to render the following declaratively.
-const createShadowRoot = (container, styles) => {
-  const shadow = container.attachShadow({ mode: "open" });
-  const div = document.createElement("div");
-  const style = document.createElement("style");
-  style.innerHTML = styles;
-
-  // create the element where we would render our app
-  const renderIn = document.createElement("div");
-
-  shadow.appendChild(div);
-  div.appendChild(style);
-  div.appendChild(renderIn);
-  return renderIn;
+const findContainer = () => {
+  return document.getElementById(globalContainerId);
 };
+const createContainer = () => {
+  const container = document.createElement("div");
+  container.setAttribute("id", globalContainerId);
+  return container;
+};
+
