@@ -33,8 +33,8 @@ export default function Card({ sentence, title, translation, link }) {
               Sentence
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {words.map((word) => (
-                <span onClick={clickWord}>{word} </span>
+              {words.map((word, i) => (
+                <span key={i} onClick={clickWord}>{word} </span>
               ))}
             </dd>
           </div>
