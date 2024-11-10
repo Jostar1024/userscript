@@ -1,21 +1,22 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 
 const trim = (str) => {
-  const res = str.trim();
+  const res = str.trim()
   return [".", ",", "!", "?"].some((symbol) => res.endsWith(symbol))
     ? res.slice(0, -1)
-    : res;
-};
+    : res
+}
 
 export default function Card({ sentence, title, translation, link }) {
-  const [word, setWord] = useState("");
-  const words = sentence.split(" ");
+  const [word, setWord] = useState("")
+  const words = sentence.split(" ")
 
+  console.log("card", sentence)
   const clickWord = (event) => {
-    const word = trim(event.target.innerHTML);
-    setWord(word);
-    console.log("click word", word);
-  };
+    const word = trim(event.target.innerHTML)
+    setWord(word)
+    console.log("click word:", word)
+  }
   return (
     <>
       <div className="p-4 md:p-5 space-y-4 mt-6 border-t border-gray-100">
@@ -34,7 +35,9 @@ export default function Card({ sentence, title, translation, link }) {
             </dt>
             <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
               {words.map((word, i) => (
-                <span key={i} onClick={clickWord}>{word} </span>
+                <span key={i} onClick={clickWord}>
+                  {word}{" "}
+                </span>
               ))}
             </dd>
           </div>
@@ -68,12 +71,12 @@ export default function Card({ sentence, title, translation, link }) {
                      bg-blue-700 hover:bg-blue-800
                      focus:ring-4 focus:outline-none focus:ring-blue-300"
           onClick={() => {
-            createAnkiCard({ word, sentence, link, title, translation });
+            createAnkiCard({ word, sentence, link, title, translation })
           }}
         >
           Create Anki Card
         </button>
       </div>
     </>
-  );
+  )
 }

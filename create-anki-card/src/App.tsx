@@ -1,16 +1,9 @@
-import React, { useState, useCallback } from "react";
-import { toDesktop } from "./request.ts";
-import styles from "./App.css?inline";
-import { log } from "./utils";
-import Card from "./Card.tsx";
-import ReactShadowRoot from "./react-shadow-root.tsx";
-
-const getSentence = () => {
-  const sentence = window.getSelection().toString();
-  return sentence == ""
-    ? "This domain is for use in illustrative examples in documents. You may use this domain in literature without prior coordination or asking for permission."
-    : sentence;
-};
+import React, { useState, useCallback, useRef, useEffect } from "react"
+import { toDesktop } from "./request.ts"
+import styles from "./App.css?inline"
+import { log } from "./utils"
+import Card from "./Card.tsx"
+import ReactShadowRoot from "./react-shadow-root.tsx"
 
 const createAnkiCard = async ({ word, sentence, title, link, translation }) => {
   const { result, error } = await toDesktop({
@@ -21,33 +14,31 @@ const createAnkiCard = async ({ word, sentence, title, link, translation }) => {
       Sentence: sentence,
       "Source-Url": link,
       "Source-Name": title,
-      Translation: translation,
+      Translation: translation
     },
-    tags: ["English"],
-  });
-  console.log(result, error);
-};
+    tags: ["English"]
+  })
+}
 
-const translate = (sentence) => sentence;
+const translate = (sentence) => sentence
 
-function App({ container: container }) {
-  const [dialog, setDialog] = useState(null);
+function App({ container: container, sentence: sentence }) {
+  const [dialog, setDialog] = useState(null)
   const dialogRef = useCallback((node) => {
     if (node !== null) {
-      setDialog(node);
-      container.style.display = "";
-      node.showModal();
+      setDialog(node)
+      container.style.display = ""
+      node.showModal()
     }
-  }, []);
-  const sentence = getSentence();
-  const title = document.title;
-  const link = document.location.href;
-  const translation = translate(sentence);
+  }, [])
+  const title = document.title
+  const link = document.location.href
+  const translation = translate(sentence)
 
   const closeModal = (event) => {
-    dialog.close();
-    container.style.display = "none";
-  };
+    dialog.close()
+    container.style.display = "none"
+  }
   /* const translation = translate(selection); */
   return (
     <div>
@@ -95,12 +86,17 @@ function App({ container: container }) {
                 </button>
               </div>
             </div>
-            <Card sentence={sentence} title={title} translation={translation} />
+            <Card
+              sentence={sentence}
+              title={title}
+              link={link}
+              translation={translation}
+            />
           </div>
         </dialog>
       </ReactShadowRoot>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
